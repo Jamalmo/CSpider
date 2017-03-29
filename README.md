@@ -1,5 +1,9 @@
 # CSpider 
+<<<<<<< HEAD
 使用HTTP协议的网段主机探测器
+=======
+###使用HTTP协议的C段主机探测器
+>>>>>>> c8de3ded76e610030c4ab2aa98c242fe9549204d
 
 使用方法：
 `python cspider.py 127.0.0.0/24`
