@@ -14,6 +14,7 @@ Headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
 			AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
 # Close https error
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+ports = ['21','80','81','82','88','90','443','8000','8001','8080','8081','8082','8443','8843','3306']
 
 class CSpider:
 	def __init__(self,target,threads,timeout):
@@ -38,48 +39,30 @@ class CSpider:
 	# Get Infomation
 	def scan(self):
 		ip = self.queue.get()
-		try:
-			url = 'http://'+ip+'/'
-			req = requests.get(url,headers=Headers,timeout=self.timeout,verify=False)
-			content = req.content.decode()
-			soup = BeautifulSoup(content, "lxml")
-			size = len(content)
-			code = req.status_code
+		for p in ports:
 			try:
-				title = soup.title.string
+				url = 'http://'+ip+':%s/' % p
+				req = requests.get(url,headers=Headers,timeout=self.timeout,verify=False)
+				content = req.content.decode()
+				soup = BeautifulSoup(content, "html.parser")
+				size = len(content)
+				code = req.status_code
+				try:
+					title = soup.title.string
+				except:
+					title = ''
+
+				title = title.strip().strip('\r').strip('\n')[:55]
+				print("%-20s %-6d %-10s %-50s" % (ip+':%s'%p,code,size,title))
 			except:
-				title = ''
-
-			title = title.strip().strip('\r').strip('\n')[:40]
-			print("%-20s %-6d %-10s %-50s" % (ip,code,size,title))
-		except:
-			pass
-
-		self.semaphore.release() # Unlock thread
-
-		try:
-			url = 'https://'+ip+'/'
-			req = requests.get(url,headers=Headers,timeout=self.timeout,verify=False)
-			content = req.content.decode()
-			soup = BeautifulSoup(content, "lxml")
-			size = len(content)
-			code = req.status_code
-			try:
-				title = soup.title.string
-			except:
-				title = ''
-
-			title = title.strip().strip('\r').strip('\n')[:40]
-			print("%-20s %-6d %-10s %-50s" % (ip+':443',code,size,title))
-		except:
-			pass
+				pass
 
 		self.semaphore.release() # Unlock thread
 
 	# Start thread
 	def run(self):
 		print("Start scan... No print error info.")
-		print("%-24s %-6s %-10s %-50s" % ("IP","Status","Size","Title"))
+		print("%-20s %-6s %-10s %-50s" % ("IP","Status","Size","Title"))
 		while not self.queue.empty():
 			if self.semaphore.acquire():
 				t = threading.Thread(target=self.scan)
@@ -91,7 +74,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Process some integers.')
 	parser.add_argument('target',help='Set Target IP or IP section.')
 	parser.add_argument('-t',type=int,default=50,dest='threads',help="thread num.")
-	parser.add_argument('-o',type=int,default=8,dest='timeout',help="timeout.")
+	parser.add_argument('-o',type=int,default=3,dest='timeout',help="timeout.")
 	args = parser.parse_args()
 
 	target  = args.target
