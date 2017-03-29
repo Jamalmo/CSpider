@@ -7,10 +7,13 @@ import requests
 import argparse
 import threading
 from bs4 import BeautifulSoup
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # 配置
 Headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
 			AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
+# 禁用安全请求警告
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class CSpider:
 	def __init__(self,target,threads,timeout):
@@ -35,9 +38,9 @@ class CSpider:
 	# 爬取信息
 	def scan(self):
 		ip = self.queue.get()
-		url = 'http://'+ip+'/'
 		try:
-			req = requests.get(url,headers=Headers,timeout=self.timeout)
+			url = 'http://'+ip+'/'
+			req = requests.get(url,headers=Headers,timeout=self.timeout,verify=False)
 			content = req.content.decode()
 			soup = BeautifulSoup(content, "lxml")
 			size = len(content)
@@ -48,7 +51,26 @@ class CSpider:
 				title = ''
 
 			title = title.strip().strip('\r').strip('\n')[:40]
-			print("%-16s %-6d %-10s %-50s" % (ip,code,size,title))
+			print("%-20s %-6d %-10s %-50s" % (ip,code,size,title))
+		except:
+			pass
+
+		self.semaphore.release() # 解锁线程
+
+		try:
+			url = 'https://'+ip+'/'
+			req = requests.get(url,headers=Headers,timeout=self.timeout,verify=False)
+			content = req.content.decode()
+			soup = BeautifulSoup(content, "lxml")
+			size = len(content)
+			code = req.status_code
+			try:
+				title = soup.title.string
+			except:
+				title = ''
+
+			title = title.strip().strip('\r').strip('\n')[:40]
+			print("%-20s %-6d %-10s %-50s" % (ip+':443',code,size,title))
 		except:
 			pass
 
@@ -57,7 +79,7 @@ class CSpider:
 	# 启动线程
 	def run(self):
 		print("开始扫描,发生错误不会打印...")
-		print("%-16s %-6s %-10s %-50s" % ("IP","状态","返回大小","标题"))
+		print("%-24s %-6s %-10s %-50s" % ("IP","状态","返回大小","标题"))
 		while not self.queue.empty():
 			if self.semaphore.acquire():
 				t = threading.Thread(target=self.scan)
