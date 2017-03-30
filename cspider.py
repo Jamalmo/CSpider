@@ -14,7 +14,7 @@ Headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
 			AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
 # Close https error
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-ports = ['21','80','81','82','88','90','443','2222','2333','6631','6621','6666',
+ports = ['21','80','81','82','88','90','443','2000','2222','2333','6631','6621','6666',
 		'8000','8001','8080','8081','8082','8443','8843','3306','8888','8809','9999',
 		'2083','3128','7001','7002','50000','10000','9200','9300'
 ]
@@ -26,7 +26,6 @@ class CSpider:
 		self.timeout = timeout
 		self.queue   = queue.Queue()
 		self.semaphore = threading.Semaphore(self.threads) # Thread cound
-		
 		self.load_ip() # Load ip
 
 	# Add ip on queue
@@ -42,6 +41,7 @@ class CSpider:
 	# Get Infomation
 	def scan(self):
 		ip = self.queue.get()
+		fo = open(self.target[:-3]+'.html','a+') # create markdown log file.
 		for p in ports:
 			try:
 				url = 'http://'+ip+':%s/' % p
@@ -57,7 +57,10 @@ class CSpider:
 				if code == 200:
 					title = title.strip().strip('\r').strip('\n')[:36]
 					print("%-20s %-6d %-10s %-50s" % (ip+':%s'%p,code,size,title))
+					fo.write("<pre><a href='%s' target='_blank'>%s</a>		%18d 	%s  	%s</pre>\n" % (url,ip+':%s'%p,code,size,title))
+					fo.close()
 			except:
+				# print(msg)
 				pass
 
 		self.semaphore.release() # Unlock thread
