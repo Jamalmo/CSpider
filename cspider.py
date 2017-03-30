@@ -14,7 +14,10 @@ Headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
 			AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
 # Close https error
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-ports = ['21','80','81','82','88','90','443','8000','8001','8080','8081','8082','8443','8843','3306']
+ports = ['21','80','81','82','88','90','443','2222','2333','6631','6621','6666',
+		'8000','8001','8080','8081','8082','8443','8843','3306','8888','8809','9999',
+		'2083','3128','7001','7002','50000','10000','9200','9300'
+]
 
 class CSpider:
 	def __init__(self,target,threads,timeout):
@@ -51,9 +54,9 @@ class CSpider:
 					title = soup.title.string
 				except:
 					title = ''
-
-				title = title.strip().strip('\r').strip('\n')[:55]
-				print("%-20s %-6d %-10s %-50s" % (ip+':%s'%p,code,size,title))
+				if code == 200:
+					title = title.strip().strip('\r').strip('\n')[:36]
+					print("%-20s %-6d %-10s %-50s" % (ip+':%s'%p,code,size,title))
 			except:
 				pass
 
