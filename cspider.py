@@ -57,7 +57,7 @@ class CSpider:
 				if code == 200:
 					title = title.strip().strip('\r').strip('\n')[:36]
 					print("%-20s %-6d %-10s %-50s" % (ip+':%s'%p,code,size,title))
-					fo.write("<pre><a href='%s' target='_blank'>%s</a>		%18d 	%s  	%s</pre>\n" % (url,ip+':%s'%p,code,size,title))
+					fo.write("<pre><a href='%s' target='_blank'>%s</a>	%8d 	%s  	%s</pre>\n" % (url,ip+':%s'%p,code,size,title))
 					fo.close()
 			except:
 				# print(msg)
