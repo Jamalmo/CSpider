@@ -14,9 +14,9 @@ Headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
 			AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
 # Close https error
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-ports = ['21','80','81','82','88','90','443','2000','2222','2333','6631','6621','6666',
-		'8000','8001','8080','8081','8082','8443','8843','3306','8888','8809','9999',
-		'2083','3128','7001','7002','50000','10000','9200','9300'
+ports = ['80','81','82','88','90','443','2000','2222','2333','6666',
+		'8000','8001','8002','8080','8081','8082','8443','8843','8888','8809','9999',
+		'7001','7002'
 ]
 
 class CSpider:
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 	# Argument parser
 	parser = argparse.ArgumentParser(description='Process some integers.')
 	parser.add_argument('target',help='Set Target IP or IP section.')
-	parser.add_argument('-t',type=int,default=50,dest='threads',help="thread num.")
+	parser.add_argument('-t',type=int,default=100,dest='threads',help="thread num.")
 	parser.add_argument('-o',type=int,default=3,dest='timeout',help="timeout.")
 	args = parser.parse_args()
 
